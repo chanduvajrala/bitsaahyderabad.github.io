@@ -9,7 +9,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts for standard clean look -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
         rel="stylesheet">
 
@@ -33,7 +32,7 @@
 
 <body class="bg-stone-100 font-sans text-stone-800 min-h-screen pb-24">
 
-    <!-- Sticky Top Header -->
+    <!-- Sticky Header -->
     <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 shadow-sm">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -41,10 +40,11 @@
                     class="bg-bitsaa text-white font-extrabold px-2.5 py-1 rounded-md text-xs tracking-wider">BITSAA</span>
                 <h1 class="font-bold text-stone-900 text-base leading-tight">The Connect Wall</h1>
             </div>
-            <span
-                class="text-[11px] font-semibold text-stone-500 bg-stone-100 px-2 py-1 rounded-full border border-stone-200">
-                🍕 Brunch Mode: ON
-            </span>
+
+            <!-- User Profile Badge / Login Status -->
+            <div id="user-badge" class="text-right">
+                <!-- Injected via JS -->
+            </div>
         </div>
     </header>
 
@@ -56,20 +56,18 @@
             <div class="relative z-10">
                 <h2 class="text-xl font-extrabold tracking-tight mb-1">Dear Senior, ek help chahiye... 🤝</h2>
                 <p class="text-xs text-red-100 leading-relaxed mb-3">
-                    Skip the awkward small talk! Post what you need, offer what you know, and let’s get straight to
-                    building cool stuff.
+                    Skip the awkward small talk! Post what you need, offer what you know. <b>Max 2 pins per BITSian!</b>
                 </p>
                 <div
                     class="inline-flex items-center gap-1.5 text-[11px] font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
                     <span>✨ One Postcard. One Ping. Endless Possibilities.</span>
                 </div>
             </div>
-            <!-- Background Decorative Graphic -->
             <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none">
             </div>
         </div>
 
-        <!-- Filter Tabs (Asks vs Offers) -->
+        <!-- Filter Tabs -->
         <div class="flex bg-stone-200 p-1 rounded-xl mb-4 text-xs font-bold">
             <button id="tab-all" onclick="filterCards('ALL')"
                 class="flex-1 py-2 rounded-lg transition-all bg-white text-stone-900 shadow-sm">
@@ -85,9 +83,8 @@
             </button>
         </div>
 
-        <!-- Cards Feed Container -->
+        <!-- Feed Container -->
         <div id="cards-container" class="space-y-3.5">
-            <!-- Loading State -->
             <div id="loading-state" class="text-center py-10">
                 <div
                     class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-bitsaa border-t-transparent mb-2">
@@ -101,7 +98,7 @@
     <!-- Floating Action Button (FAB) -->
     <div class="fixed bottom-5 left-0 right-0 px-4 pointer-events-none z-20">
         <div class="max-w-md mx-auto flex justify-center">
-            <button onclick="toggleModal(true)"
+            <button onclick="handleFabClick()"
                 class="pointer-events-auto bg-bitsaa hover:bg-bitsaa-dark text-white font-bold px-6 py-3.5 rounded-full shadow-xl flex items-center gap-2 transform active:scale-95 transition-all border-2 border-white">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
@@ -111,18 +108,57 @@
         </div>
     </div>
 
-    <!-- Create Post Modal -->
+    <!-- 1. Quick Login Modal -->
+    <div id="login-modal"
+        class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4">
+            <div>
+                <h3 class="font-extrabold text-base text-stone-900">Quick BITSian Check-in 🎟️</h3>
+                <p class="text-[11px] text-stone-500">Enter your details once so others know who they are connecting
+                    with.</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">Your WhatsApp/Phone Number <span
+                            class="text-bitsaa">*</span></label>
+                    <input type="tel" id="login-phone" required maxlength="10" placeholder="10-digit mobile number"
+                        class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    <p class="text-[10px] text-stone-400 mt-1">Must be a valid 10-digit mobile number.</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">Batch / ID <span
+                            class="text-bitsaa">*</span></label>
+                    <input type="text" id="login-batch" required maxlength="13" placeholder="e.g. 2012A3 or '18 Batch"
+                        class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    <p class="text-[10px] text-stone-400 mt-1">Max 13 characters. Letters, numbers, and spaces only.</p>
+                </div>
+
+                <div id="login-error-msg"
+                    class="hidden p-2 bg-red-50 border border-red-200 text-red-600 text-[11px] rounded-lg font-semibold">
+                </div>
+
+                <button type="submit" id="login-btn"
+                    class="w-full bg-bitsaa text-white font-bold py-3 rounded-xl shadow-md text-xs">
+                    Let me in! 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Create Post Modal -->
     <div id="post-modal"
-        class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-40 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
-        <div
-            class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200">
+        class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-40 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto shadow-2xl">
 
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <div>
                     <h3 class="font-extrabold text-base text-stone-900">Drop a Card on the Wall 📌</h3>
-                    <p class="text-[11px] text-stone-500">No fluff. What's your pitch or demand?</p>
+                    <p class="text-[11px] text-stone-500">Keep it snappy. Max 2 pins per BITSian.</p>
                 </div>
-                <button onclick="toggleModal(false)" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
+                <button onclick="toggleModal('post-modal', false)"
+                    class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -137,13 +173,13 @@
                     <label class="block font-bold text-stone-700 mb-1">What are you posting?</label>
                     <div class="grid grid-cols-2 gap-2">
                         <label
-                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 transition-all">
+                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
                             <input type="radio" name="category" value="ASK" class="sr-only" checked>
                             <div class="font-bold text-amber-700">🟧 Junior / Seeker</div>
-                            <div class="text-[10px] text-stone-500">I need help, advice, or job</div>
+                            <div class="text-[10px] text-stone-500">I need help or advice</div>
                         </label>
                         <label
-                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition-all">
+                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                             <input type="radio" name="category" value="OFFER" class="sr-only">
                             <div class="font-bold text-blue-700">🟦 Senior / Giver</div>
                             <div class="text-[10px] text-stone-500">Hiring, mentoring, funding</div>
@@ -155,114 +191,162 @@
                 <div>
                     <label class="block font-bold text-stone-700 mb-1">Headline / Main Ask <span
                             class="text-bitsaa">*</span></label>
-                    <input type="text" id="headline" required placeholder="e.g. Hiring React Devs / Need Product Mentor"
+                    <input type="text" id="headline" required maxlength="60"
+                        placeholder="e.g. Hiring React Devs / Need Product Mentor"
                         class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    <p class="text-[10px] text-stone-400 mt-0.5">5-60 characters. Plain text only.</p>
                 </div>
 
                 <!-- Details -->
                 <div>
                     <label class="block font-bold text-stone-700 mb-1">Quick Details / Context <span
                             class="text-bitsaa">*</span></label>
-                    <textarea id="description" rows="3" required
+                    <textarea id="description" rows="3" required maxlength="180"
                         placeholder="Give 2 lines of context. 'Building a 0->1 fintech app, looking to connect over tea.'"
                         class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs"></textarea>
+                    <p class="text-[10px] text-stone-400 mt-0.5">10-180 characters.</p>
                 </div>
 
-                <!-- Batch & Company/Role -->
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-bold text-stone-700 mb-1">Batch / ID <span
-                                class="text-bitsaa">*</span></label>
-                        <input type="text" id="batch" required placeholder="e.g. 2012A3 or '18 Batch"
-                            class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-stone-700 mb-1">Company / Role</label>
-                        <input type="text" id="role" placeholder="e.g. Apollo / Founder"
-                            class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
-                    </div>
-                </div>
-
-                <!-- Contact Method -->
+                <!-- Role -->
                 <div>
-                    <label class="block font-bold text-stone-700 mb-1">WhatsApp / Contact No. <span
-                            class="text-bitsaa">*</span></label>
-                    <input type="tel" id="contact" required placeholder="10-digit number (e.g., 9876543210)"
+                    <label class="block font-bold text-stone-700 mb-1">Company / Role</label>
+                    <input type="text" id="role" maxlength="40" placeholder="e.g. Apollo / Founder / Student"
                         class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    <p class="text-[10px] text-stone-400 mt-0.5">Max 40 characters.</p>
                 </div>
 
-                <!-- Submit Button -->
+                <div id="limit-error-msg"
+                    class="hidden p-2.5 bg-red-100 border border-red-300 text-red-700 text-[11px] font-bold rounded-lg text-center">
+                </div>
+
                 <button type="submit" id="submit-btn"
-                    class="w-full bg-bitsaa hover:bg-bitsaa-dark text-white font-bold py-3 rounded-xl shadow-md transition-all text-xs flex justify-center items-center gap-2">
+                    class="w-full bg-bitsaa hover:bg-bitsaa-dark text-white font-bold py-3 rounded-xl shadow-md text-xs flex justify-center items-center gap-2">
                     <span>Pin to Wall 🚀</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
     <script>
-        // Config - Replace with your deployed Apps Script Web App URL
-        const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
-
-        // Fallback Mock Data for immediate offline testing
-        const MOCK_DATA = [
-            {
-                id: "p_101",
-                category: "ASK",
-                headline: "Connect me to someone in Product Management! 🚀",
-                description: "Frontend engineer with 3 yrs experience looking to transition to PM role. Startup 0->1 karna hai!",
-                batch: "2021A7",
-                role: "Frontend Dev",
-                contact: "919999999999"
-            },
-            {
-                id: "p_102",
-                category: "OFFER",
-                headline: "Hiring Senior Frontend Engineers 💻",
-                description: "Looking for Next.js / React devs for Apollo HealthCo team. Drop a ping, direct referral!",
-                batch: "2012A3",
-                role: "Tech Lead @ Apollo",
-                contact: "919888888888"
-            },
-            {
-                id: "p_103",
-                category: "OFFER",
-                headline: "VC / Angel Introductions & Pitch Review 💸",
-                description: "Built & scaled 2 startups. Happy to review decks over brunch or give angel intros.",
-                batch: "2008B2",
-                role: "Founder & Investor",
-                contact: "919777777777"
-            }
-        ];
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWUoweNvJHgqGbjVt_5r0YY0L4ceaKEOA40OtmaudCd07EhyF2sCLTijbcJxM31J_h/exec";
 
         let allPosts = [];
         let currentFilter = 'ALL';
+        let currentUser = JSON.parse(localStorage.getItem('bitsaa_user')) || null;
 
-        // Fetch Posts
-        async function fetchPosts() {
-            try {
-                if (APPS_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-                    // Use Mock data if script URL is not configured
-                    setTimeout(() => {
-                        allPosts = MOCK_DATA;
-                        renderCards();
-                    }, 600);
-                    return;
-                }
-
-                const res = await fetch(APPS_SCRIPT_URL);
-                const data = await res.json();
-                allPosts = data;
-                renderCards();
-            } catch (err) {
-                console.error("Error fetching posts:", err);
-                allPosts = MOCK_DATA; // Fallback
-                renderCards();
+        // Render User Header Profile Status
+        function renderUserBadge() {
+            const badgeContainer = document.getElementById('user-badge');
+            if (currentUser) {
+                const myPinCount = allPosts.filter(p => p.contact && p.contact.toString().toLowerCase() === currentUser.phone.toLowerCase()).length;
+                badgeContainer.innerHTML = `
+          <div class="text-[10px] text-stone-500 font-semibold">Logged in as:</div>
+          <div class="text-xs font-bold text-stone-800">${sanitizeHTML(currentUser.batch)} (${myPinCount}/2 Pins)</div>
+        `;
+            } else {
+                badgeContainer.innerHTML = `
+          <button onclick="toggleModal('login-modal', true)" class="text-xs font-bold text-bitsaa underline">Login</button>
+        `;
             }
         }
 
-        // Render Cards to DOM
+        // Sanitizer to prevent XSS / Special Script injection
+        function sanitizeHTML(str) {
+            return (str || '').toString().replace(/[&<>"']/g, function (m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+            });
+        }
+
+        // Modal Control Helper
+        function toggleModal(id, show) {
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        }
+
+        // Login Form Handler
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const phoneInput = document.getElementById('login-phone').value.trim();
+            const batchInput = document.getElementById('login-batch').value.trim();
+            const errBox = document.getElementById('login-error-msg');
+            const loginBtn = document.getElementById('login-btn');
+
+            errBox.classList.add('hidden');
+
+            // Form Validations
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if (!phoneRegex.test(phoneInput)) {
+                errBox.innerText = "Please enter a valid 10-digit Indian mobile number.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            const batchRegex = /^[a-zA-Z0-9\s]{2,13}$/;
+            if (!batchRegex.test(batchInput)) {
+                errBox.innerText = "Batch/ID must be 2-13 characters long without special symbols.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            loginBtn.innerText = "Checking in...";
+            loginBtn.disabled = true;
+
+            currentUser = { phone: phoneInput, batch: batchInput };
+            localStorage.setItem('bitsaa_user', JSON.stringify(currentUser));
+
+            // Sync User Registration to Sheets
+            try {
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'LOGIN', phone: phoneInput, batch: batchInput })
+                });
+            } catch (err) {
+                console.warn("Could not sync user to spreadsheet, proceeding locally.", err);
+            } finally {
+                loginBtn.innerText = "Let me in! 🚀";
+                loginBtn.disabled = false;
+            }
+
+            toggleModal('login-modal', false);
+            renderUserBadge();
+            toggleModal('post-modal', true);
+        }
+
+        // FAB Click Handler
+        function handleFabClick() {
+            if (!currentUser) {
+                toggleModal('login-modal', true);
+            } else {
+                const myPinCount = allPosts.filter(p => p.contact && p.contact.toString().toLowerCase() === currentUser.phone.toLowerCase()).length;
+                if (myPinCount >= 2) {
+                    alert("🛑 Overachiever alert! You have already pinned 2 cards on the wall.");
+                    return;
+                }
+                toggleModal('post-modal', true);
+            }
+        }
+
+        // Fetch Posts from AppScript
+        async function fetchPosts() {
+            try {
+                const res = await fetch(APPS_SCRIPT_URL);
+                const data = await res.json();
+                allPosts = Array.isArray(data) ? data : [];
+                renderCards();
+                renderUserBadge();
+            } catch (err) {
+                console.error("Error fetching posts:", err);
+                document.getElementById('cards-container').innerHTML = `
+                  <div class="text-center py-10 text-stone-500 text-xs">
+                    Failed to connect to wall. Please refresh the page.
+                  </div>
+                `;
+            }
+        }
+
+        // Render Feed
         function renderCards() {
             const container = document.getElementById('cards-container');
             container.innerHTML = '';
@@ -272,19 +356,17 @@
                 return post.category === currentFilter;
             });
 
-            // Update Tab Counts
             document.getElementById('count-all').innerText = allPosts.length;
             document.getElementById('count-ask').innerText = allPosts.filter(p => p.category === 'ASK').length;
             document.getElementById('count-offer').innerText = allPosts.filter(p => p.category === 'OFFER').length;
 
             if (filtered.length === 0) {
                 container.innerHTML = `
-          <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-stone-300 p-6">
-            <p class="text-2xl mb-1">👻</p>
-            <p class="text-xs font-bold text-stone-700">No postcards pinned here yet!</p>
-            <p class="text-[11px] text-stone-400 mt-1">Be the first one to drop an ask or offer.</p>
-          </div>
-        `;
+                  <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-stone-300 p-6">
+                    <p class="text-2xl mb-1">👻</p>
+                    <p class="text-xs font-bold text-stone-700">No postcards pinned here yet!</p>
+                  </div>
+                `;
                 return;
             }
 
@@ -294,47 +376,27 @@
                 const badgeBg = isAsk ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-blue-100 text-blue-800 border-blue-300';
                 const categoryLabel = isAsk ? '🟧 SEEKING' : '🟦 OFFERING';
 
-                const cleanPhone = post.contact.replace(/\D/g, '');
-                const waMessage = encodeURIComponent(`Hi! Saw your card "${post.headline}" on the BITSAA Connect Wall.`);
-                const waLink = `https://wa.me/${cleanPhone}?text=${waMessage}`;
+                const cleanPhone = (post.contact || '').toString().replace(/\D/g, '');
+                const headlineText = sanitizeHTML(post.headline);
+                const waMessage = encodeURIComponent(`Hi! Saw your card "${headlineText}" on the BITSAA Connect Wall.`);
+                const waLink = `https://wa.me/91${cleanPhone}?text=${waMessage}`;
 
                 const cardHtml = `
-          <div class="bg-white rounded-2xl p-4 border ${cardBg} shadow-sm relative overflow-hidden transition-all hover:shadow-md">
-            
-            <!-- Category & Batch Header -->
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${badgeBg}">
-                ${categoryLabel}
-              </span>
-              <span class="text-[11px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
-                ${post.batch || 'BITS Alumni'}
-              </span>
-            </div>
-
-            <!-- Card Headline -->
-            <h3 class="font-extrabold text-sm text-stone-900 mb-1 leading-snug">
-              ${post.headline}
-            </h3>
-
-            <!-- Card Description -->
-            <p class="text-xs text-stone-600 leading-relaxed mb-3">
-              ${post.description}
-            </p>
-
-            <!-- Card Footer & WhatsApp CTA -->
-            <div class="flex items-center justify-between pt-2 border-t border-stone-100">
-              <span class="text-[11px] font-semibold text-stone-500 truncate max-w-[150px]">
-                ${post.role ? '📍 ' + post.role : 'BITSian'}
-              </span>
-
-              <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95">
-                <span>WhatsApp Ping</span>
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-              </a>
-            </div>
-
-          </div>
-        `;
+                  <div class="bg-white rounded-2xl p-4 border ${cardBg} shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${badgeBg}">${categoryLabel}</span>
+                      <span class="text-[11px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">${sanitizeHTML(post.batch) || 'BITSian'}</span>
+                    </div>
+                    <h3 class="font-extrabold text-sm text-stone-900 mb-1 leading-snug">${headlineText}</h3>
+                    <p class="text-xs text-stone-600 leading-relaxed mb-3">${sanitizeHTML(post.description)}</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                      <span class="text-[11px] font-semibold text-stone-500 truncate max-w-[150px]">${post.role ? '📍 ' + sanitizeHTML(post.role) : 'BITSian'}</span>
+                      <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg active:scale-95">
+                        <span>WhatsApp Ping</span>
+                      </a>
+                    </div>
+                  </div>
+                `;
                 container.innerHTML += cardHtml;
             });
         }
@@ -344,68 +406,86 @@
             currentFilter = type;
             ['ALL', 'ASK', 'OFFER'].forEach(t => {
                 const btn = document.getElementById(`tab-${t.toLowerCase()}`);
-                if (t === type) {
-                    btn.className = 'flex-1 py-2 rounded-lg transition-all bg-white text-stone-900 shadow-sm';
-                } else {
-                    btn.className = 'flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900';
-                }
+                btn.className = t === type ? 'flex-1 py-2 rounded-lg bg-white text-stone-900 shadow-sm' : 'flex-1 py-2 rounded-lg text-stone-600';
             });
             renderCards();
         }
 
-        // Modal Control
-        function toggleModal(show) {
-            const modal = document.getElementById('post-modal');
-            if (show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        // Submit Form
+        // Submit New Post
         async function handleFormSubmit(e) {
             e.preventDefault();
 
             const submitBtn = document.getElementById('submit-btn');
+            const errBox = document.getElementById('limit-error-msg');
+            errBox.classList.add('hidden');
+
+            const headline = document.getElementById('headline').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const role = document.getElementById('role').value.trim();
+
+            // Field Validations
+            const textRegex = /^[a-zA-Z0-9\s.,!?'-]{5,60}$/;
+            if (!textRegex.test(headline)) {
+                errBox.innerText = "Headline must be 5-60 characters and avoid special symbols.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (description.length < 10 || description.length > 180) {
+                errBox.innerText = "Description must be between 10 and 180 characters.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            if (role.length > 40) {
+                errBox.innerText = "Company/Role cannot exceed 40 characters.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
             submitBtn.innerText = 'Pinning... 📌';
             submitBtn.disabled = true;
 
             const payload = {
+                action: 'CREATE_POST',
                 category: document.querySelector('input[name="category"]:checked').value,
-                headline: document.getElementById('headline').value,
-                description: document.getElementById('description').value,
-                batch: document.getElementById('batch').value,
-                role: document.getElementById('role').value,
-                contact: document.getElementById('contact').value,
+                headline: headline,
+                description: description,
+                batch: currentUser ? currentUser.batch : 'BITSian',
+                role: role,
+                contact: currentUser ? currentUser.phone : ''
             };
 
             try {
-                if (APPS_SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbxWUoweNvJHgqGbjVt_5r0YY0L4ceaKEOA40OtmaudCd07EhyF2sCLTijbcJxM31J_h/exec") {
-                    await fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+
+                const resData = await response.json();
+
+                if (resData.status === 'limit_reached') {
+                    errBox.innerText = resData.message;
+                    errBox.classList.remove('hidden');
+                    return;
                 }
 
-                // Optimistic UI Update
-                allPosts.unshift({ id: 'p_' + Date.now(), ...payload });
-                renderCards();
-
-                // Reset & Close
-                document.getElementById('card-form').reset();
-                toggleModal(false);
+                if (resData.status === 'success') {
+                    document.getElementById('card-form').reset();
+                    toggleModal('post-modal', false);
+                    await fetchPosts(); // Re-fetch feed directly from database
+                } else {
+                    alert("Failed to save post: " + (resData.message || "Unknown error"));
+                }
             } catch (err) {
-                alert("Failed to pin postcard. Please try again.");
+                alert("Network error. Please try again.");
             } finally {
                 submitBtn.innerText = 'Pin to Wall 🚀';
                 submitBtn.disabled = false;
             }
         }
 
-        // Initial Load
         fetchPosts();
     </script>
 </body>
