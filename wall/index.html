@@ -32,34 +32,82 @@
 
 <body class="bg-stone-100 font-sans text-stone-800 min-h-screen pb-24">
 
-    <!-- Sticky Header -->
-    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 shadow-sm">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span
-                    class="bg-bitsaa text-white font-extrabold px-2.5 py-1 rounded-md text-xs tracking-wider">BITSAA</span>
-                <h1 class="font-bold text-stone-900 text-base leading-tight">The Connect Wall</h1>
+    <!-- Sticky Header & Controls Group -->
+    <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <!-- Main Top Header -->
+        <header class="px-4 py-3">
+            <div class="max-w-md mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span
+                        class="bg-bitsaa text-white font-extrabold px-2.5 py-1 rounded-md text-xs tracking-wider">BITSAA</span>
+                    <h1 class="font-bold text-stone-900 text-base leading-tight">The Connect Wall</h1>
+                </div>
+
+                <!-- User Profile Badge / Login Status -->
+                <div id="user-badge" class="text-right">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Sticky Controls: Search Bar & Tabs -->
+        <div class="max-w-md mx-auto px-4 pb-3 space-y-2">
+            <!-- Client-Side Search Bar -->
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" id="search-input" oninput="handleSearchInput(event)"
+                    placeholder="Search keywords, roles, batches, or asks..."
+                    class="w-full pl-9 pr-8 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-bitsaa shadow-inner">
+                <button id="clear-search-btn" onclick="clearSearch()"
+                    class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-stone-400 hover:text-stone-600 font-bold text-xs">
+                    ✕
+                </button>
             </div>
 
-            <!-- User Profile Badge / Login Status -->
-            <div id="user-badge" class="text-right">
-                <!-- Injected via JS -->
+            <!-- Filter Tabs -->
+            <div class="flex bg-stone-200 p-1 rounded-xl text-xs font-bold">
+                <button id="tab-all" onclick="filterCards('ALL')"
+                    class="flex-1 py-1.5 rounded-lg transition-all bg-white text-stone-900 shadow-sm">
+                    All Cards (<span id="count-all">0</span>)
+                </button>
+                <button id="tab-ask" onclick="filterCards('ASK')"
+                    class="flex-1 py-1.5 rounded-lg transition-all text-stone-600 hover:text-stone-900">
+                    🟧 Asks (<span id="count-ask">0</span>)
+                </button>
+                <button id="tab-offer" onclick="filterCards('OFFER')"
+                    class="flex-1 py-1.5 rounded-lg transition-all text-stone-600 hover:text-stone-900">
+                    🟦 Offers (<span id="count-offer">0</span>)
+                </button>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
+    <!-- Main Scrollable Container -->
     <main class="max-w-md mx-auto px-4 pt-4">
 
-        <!-- Quirky Hero Banner -->
-        <div class="bg-bitsaa text-white rounded-2xl p-5 mb-5 shadow-lg relative overflow-hidden">
-            <div class="relative z-10">
-                <h2 class="text-xl font-extrabold tracking-tight mb-1">Dear Senior, ek help chahiye... 🤝</h2>
-                <p class="text-xs text-red-100 leading-relaxed mb-3">
+        <!-- Quirky Hero Banner (Dismissible) -->
+        <div id="hero-banner"
+            class="bg-bitsaa text-white rounded-2xl p-4 mb-4 shadow-lg relative overflow-hidden transition-all duration-300">
+            <!-- Dismiss / Hide Button -->
+            <button onclick="hideHeroBanner()" title="Hide banner"
+                class="absolute top-3 right-3 text-white/70 hover:text-white p-1 rounded-full bg-black/10 hover:bg-black/20 z-20 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="relative z-10 pr-6">
+                <h2 class="text-lg font-extrabold tracking-tight mb-1">Dear Senior, ek help chahiye... 🤝</h2>
+                <p class="text-xs text-red-100 leading-relaxed mb-2.5">
                     Skip the awkward small talk! Post what you need, offer what you know. <b>Max 2 pins per BITSian!</b>
                 </p>
                 <div
-                    class="inline-flex items-center gap-1.5 text-[11px] font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
+                    class="inline-flex items-center gap-1.5 text-[10px] font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
                     <span>✨ One Postcard. One Ping. Endless Possibilities.</span>
                 </div>
             </div>
@@ -67,23 +115,7 @@
             </div>
         </div>
 
-        <!-- Filter Tabs -->
-        <div class="flex bg-stone-200 p-1 rounded-xl mb-4 text-xs font-bold">
-            <button id="tab-all" onclick="filterCards('ALL')"
-                class="flex-1 py-2 rounded-lg transition-all bg-white text-stone-900 shadow-sm">
-                All Cards (<span id="count-all">0</span>)
-            </button>
-            <button id="tab-ask" onclick="filterCards('ASK')"
-                class="flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900">
-                🟧 Asks (<span id="count-ask">0</span>)
-            </button>
-            <button id="tab-offer" onclick="filterCards('OFFER')"
-                class="flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900">
-                🟦 Offers (<span id="count-offer">0</span>)
-            </button>
-        </div>
-
-        <!-- Feed Container -->
+        <!-- Feed Container (Scrolls underneath header) -->
         <div id="cards-container" class="space-y-3.5">
             <div id="loading-state" class="text-center py-10">
                 <div
@@ -232,7 +264,24 @@
 
         let allPosts = [];
         let currentFilter = 'ALL';
+        let searchQuery = '';
         let currentUser = JSON.parse(localStorage.getItem('bitsaa_user')) || null;
+
+        // Check Hero Banner Visibility Preference
+        function initHeroBanner() {
+            const isHidden = localStorage.getItem('bitsaa_hide_hero');
+            if (isHidden === 'true') {
+                const banner = document.getElementById('hero-banner');
+                if (banner) banner.classList.add('hidden');
+            }
+        }
+
+        // Hide Hero Banner Function
+        function hideHeroBanner() {
+            const banner = document.getElementById('hero-banner');
+            banner.classList.add('hidden');
+            localStorage.setItem('bitsaa_hide_hero', 'true');
+        }
 
         // Render User Header Profile Status
         function renderUserBadge() {
@@ -262,6 +311,25 @@
             const el = document.getElementById(id);
             if (show) el.classList.remove('hidden');
             else el.classList.add('hidden');
+        }
+
+        // Search Handlers
+        function handleSearchInput(e) {
+            searchQuery = e.target.value;
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            renderCards();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            searchQuery = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            renderCards();
         }
 
         // Login Form Handler
@@ -346,16 +414,33 @@
             }
         }
 
-        // Render Feed
+        // Render Feed with Category & Search Filters
         function renderCards() {
             const container = document.getElementById('cards-container');
             container.innerHTML = '';
 
+            const query = searchQuery.toLowerCase().trim();
+
             const filtered = allPosts.filter(post => {
-                if (currentFilter === 'ALL') return true;
-                return post.category === currentFilter;
+                // 1. Category Filter
+                const matchesCategory = (currentFilter === 'ALL') || (post.category === currentFilter);
+
+                // 2. Client-Side Search Filter
+                const headline = (post.headline || '').toLowerCase();
+                const description = (post.description || '').toLowerCase();
+                const batch = (post.batch || '').toLowerCase();
+                const role = (post.role || '').toLowerCase();
+
+                const matchesSearch = !query ||
+                    headline.includes(query) ||
+                    description.includes(query) ||
+                    batch.includes(query) ||
+                    role.includes(query);
+
+                return matchesCategory && matchesSearch;
             });
 
+            // Update Tab Counts
             document.getElementById('count-all').innerText = allPosts.length;
             document.getElementById('count-ask').innerText = allPosts.filter(p => p.category === 'ASK').length;
             document.getElementById('count-offer').innerText = allPosts.filter(p => p.category === 'OFFER').length;
@@ -363,8 +448,13 @@
             if (filtered.length === 0) {
                 container.innerHTML = `
                   <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-stone-300 p-6">
-                    <p class="text-2xl mb-1">👻</p>
-                    <p class="text-xs font-bold text-stone-700">No postcards pinned here yet!</p>
+                    <p class="text-2xl mb-1">${searchQuery ? '🔍' : '👻'}</p>
+                    <p class="text-xs font-bold text-stone-700">
+                        ${searchQuery ? `No results for "${sanitizeHTML(searchQuery)}"` : 'No postcards pinned here yet!'}
+                    </p>
+                    <p class="text-[11px] text-stone-400 mt-1">
+                        ${searchQuery ? 'Try searching for something else like "React", "PM", or "Founder".' : 'Be the first one to drop an ask or offer.'}
+                    </p>
                   </div>
                 `;
                 return;
@@ -406,7 +496,7 @@
             currentFilter = type;
             ['ALL', 'ASK', 'OFFER'].forEach(t => {
                 const btn = document.getElementById(`tab-${t.toLowerCase()}`);
-                btn.className = t === type ? 'flex-1 py-2 rounded-lg bg-white text-stone-900 shadow-sm' : 'flex-1 py-2 rounded-lg text-stone-600';
+                btn.className = t === type ? 'flex-1 py-1.5 rounded-lg bg-white text-stone-900 shadow-sm' : 'flex-1 py-1.5 rounded-lg text-stone-600';
             });
             renderCards();
         }
@@ -474,7 +564,7 @@
                 if (resData.status === 'success') {
                     document.getElementById('card-form').reset();
                     toggleModal('post-modal', false);
-                    await fetchPosts(); // Re-fetch feed directly from database
+                    await fetchPosts();
                 } else {
                     alert("Failed to save post: " + (resData.message || "Unknown error"));
                 }
@@ -486,6 +576,7 @@
             }
         }
 
+        initHeroBanner();
         fetchPosts();
     </script>
 </body>
