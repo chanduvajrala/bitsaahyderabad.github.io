@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BITSAA Connect Wall | Post. Connect. Collaborate.</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts for standard clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bitsaa: '#b40001',
+                        'bitsaa-dark': '#8a0001',
+                        'bitsaa-light': '#fff1f1',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-stone-100 font-sans text-stone-800 min-h-screen pb-24">
+
+    <!-- Sticky Top Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 py-3 shadow-sm">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span
+                    class="bg-bitsaa text-white font-extrabold px-2.5 py-1 rounded-md text-xs tracking-wider">BITSAA</span>
+                <h1 class="font-bold text-stone-900 text-base leading-tight">The Connect Wall</h1>
+            </div>
+            <span
+                class="text-[11px] font-semibold text-stone-500 bg-stone-100 px-2 py-1 rounded-full border border-stone-200">
+                🍕 Brunch Mode: ON
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto px-4 pt-4">
+
+        <!-- Quirky Hero Banner -->
+        <div class="bg-bitsaa text-white rounded-2xl p-5 mb-5 shadow-lg relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-xl font-extrabold tracking-tight mb-1">Dear Senior, ek help chahiye... 🤝</h2>
+                <p class="text-xs text-red-100 leading-relaxed mb-3">
+                    Skip the awkward small talk! Post what you need, offer what you know, and let’s get straight to
+                    building cool stuff.
+                </p>
+                <div
+                    class="inline-flex items-center gap-1.5 text-[11px] font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20">
+                    <span>✨ One Postcard. One Ping. Endless Possibilities.</span>
+                </div>
+            </div>
+            <!-- Background Decorative Graphic -->
+            <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none">
+            </div>
+        </div>
+
+        <!-- Filter Tabs (Asks vs Offers) -->
+        <div class="flex bg-stone-200 p-1 rounded-xl mb-4 text-xs font-bold">
+            <button id="tab-all" onclick="filterCards('ALL')"
+                class="flex-1 py-2 rounded-lg transition-all bg-white text-stone-900 shadow-sm">
+                All Cards (<span id="count-all">0</span>)
+            </button>
+            <button id="tab-ask" onclick="filterCards('ASK')"
+                class="flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900">
+                🟧 Asks (<span id="count-ask">0</span>)
+            </button>
+            <button id="tab-offer" onclick="filterCards('OFFER')"
+                class="flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900">
+                🟦 Offers (<span id="count-offer">0</span>)
+            </button>
+        </div>
+
+        <!-- Cards Feed Container -->
+        <div id="cards-container" class="space-y-3.5">
+            <!-- Loading State -->
+            <div id="loading-state" class="text-center py-10">
+                <div
+                    class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-bitsaa border-t-transparent mb-2">
+                </div>
+                <p class="text-xs text-stone-500 font-medium">Fetching live wall posts...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Action Button (FAB) -->
+    <div class="fixed bottom-5 left-0 right-0 px-4 pointer-events-none z-20">
+        <div class="max-w-md mx-auto flex justify-center">
+            <button onclick="toggleModal(true)"
+                class="pointer-events-auto bg-bitsaa hover:bg-bitsaa-dark text-white font-bold px-6 py-3.5 rounded-full shadow-xl flex items-center gap-2 transform active:scale-95 transition-all border-2 border-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Pin Your Postcard</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="post-modal"
+        class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-40 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+        <div
+            class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200">
+
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <div>
+                    <h3 class="font-extrabold text-base text-stone-900">Drop a Card on the Wall 📌</h3>
+                    <p class="text-[11px] text-stone-500">No fluff. What's your pitch or demand?</p>
+                </div>
+                <button onclick="toggleModal(false)" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="card-form" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs">
+
+                <!-- Category Selection -->
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">What are you posting?</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label
+                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 transition-all">
+                            <input type="radio" name="category" value="ASK" class="sr-only" checked>
+                            <div class="font-bold text-amber-700">🟧 Junior / Seeker</div>
+                            <div class="text-[10px] text-stone-500">I need help, advice, or job</div>
+                        </label>
+                        <label
+                            class="cursor-pointer border-2 border-stone-200 rounded-xl p-2.5 text-center has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 transition-all">
+                            <input type="radio" name="category" value="OFFER" class="sr-only">
+                            <div class="font-bold text-blue-700">🟦 Senior / Giver</div>
+                            <div class="text-[10px] text-stone-500">Hiring, mentoring, funding</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Headline -->
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">Headline / Main Ask <span
+                            class="text-bitsaa">*</span></label>
+                    <input type="text" id="headline" required placeholder="e.g. Hiring React Devs / Need Product Mentor"
+                        class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                </div>
+
+                <!-- Details -->
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">Quick Details / Context <span
+                            class="text-bitsaa">*</span></label>
+                    <textarea id="description" rows="3" required
+                        placeholder="Give 2 lines of context. 'Building a 0->1 fintech app, looking to connect over tea.'"
+                        class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs"></textarea>
+                </div>
+
+                <!-- Batch & Company/Role -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-stone-700 mb-1">Batch / ID <span
+                                class="text-bitsaa">*</span></label>
+                        <input type="text" id="batch" required placeholder="e.g. 2012A3 or '18 Batch"
+                            class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-700 mb-1">Company / Role</label>
+                        <input type="text" id="role" placeholder="e.g. Apollo / Founder"
+                            class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                    </div>
+                </div>
+
+                <!-- Contact Method -->
+                <div>
+                    <label class="block font-bold text-stone-700 mb-1">WhatsApp / Contact No. <span
+                            class="text-bitsaa">*</span></label>
+                    <input type="tel" id="contact" required placeholder="10-digit number (e.g., 9876543210)"
+                        class="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-bitsaa text-xs">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn"
+                    class="w-full bg-bitsaa hover:bg-bitsaa-dark text-white font-bold py-3 rounded-xl shadow-md transition-all text-xs flex justify-center items-center gap-2">
+                    <span>Pin to Wall 🚀</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Config - Replace with your deployed Apps Script Web App URL
+        const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+        // Fallback Mock Data for immediate offline testing
+        const MOCK_DATA = [
+            {
+                id: "p_101",
+                category: "ASK",
+                headline: "Connect me to someone in Product Management! 🚀",
+                description: "Frontend engineer with 3 yrs experience looking to transition to PM role. Startup 0->1 karna hai!",
+                batch: "2021A7",
+                role: "Frontend Dev",
+                contact: "919999999999"
+            },
+            {
+                id: "p_102",
+                category: "OFFER",
+                headline: "Hiring Senior Frontend Engineers 💻",
+                description: "Looking for Next.js / React devs for Apollo HealthCo team. Drop a ping, direct referral!",
+                batch: "2012A3",
+                role: "Tech Lead @ Apollo",
+                contact: "919888888888"
+            },
+            {
+                id: "p_103",
+                category: "OFFER",
+                headline: "VC / Angel Introductions & Pitch Review 💸",
+                description: "Built & scaled 2 startups. Happy to review decks over brunch or give angel intros.",
+                batch: "2008B2",
+                role: "Founder & Investor",
+                contact: "919777777777"
+            }
+        ];
+
+        let allPosts = [];
+        let currentFilter = 'ALL';
+
+        // Fetch Posts
+        async function fetchPosts() {
+            try {
+                if (APPS_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+                    // Use Mock data if script URL is not configured
+                    setTimeout(() => {
+                        allPosts = MOCK_DATA;
+                        renderCards();
+                    }, 600);
+                    return;
+                }
+
+                const res = await fetch(APPS_SCRIPT_URL);
+                const data = await res.json();
+                allPosts = data;
+                renderCards();
+            } catch (err) {
+                console.error("Error fetching posts:", err);
+                allPosts = MOCK_DATA; // Fallback
+                renderCards();
+            }
+        }
+
+        // Render Cards to DOM
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            const filtered = allPosts.filter(post => {
+                if (currentFilter === 'ALL') return true;
+                return post.category === currentFilter;
+            });
+
+            // Update Tab Counts
+            document.getElementById('count-all').innerText = allPosts.length;
+            document.getElementById('count-ask').innerText = allPosts.filter(p => p.category === 'ASK').length;
+            document.getElementById('count-offer').innerText = allPosts.filter(p => p.category === 'OFFER').length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+          <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-stone-300 p-6">
+            <p class="text-2xl mb-1">👻</p>
+            <p class="text-xs font-bold text-stone-700">No postcards pinned here yet!</p>
+            <p class="text-[11px] text-stone-400 mt-1">Be the first one to drop an ask or offer.</p>
+          </div>
+        `;
+                return;
+            }
+
+            filtered.forEach(post => {
+                const isAsk = post.category === 'ASK';
+                const cardBg = isAsk ? 'bg-amber-50/50 border-amber-200' : 'bg-blue-50/50 border-blue-200';
+                const badgeBg = isAsk ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-blue-100 text-blue-800 border-blue-300';
+                const categoryLabel = isAsk ? '🟧 SEEKING' : '🟦 OFFERING';
+
+                const cleanPhone = post.contact.replace(/\D/g, '');
+                const waMessage = encodeURIComponent(`Hi! Saw your card "${post.headline}" on the BITSAA Connect Wall.`);
+                const waLink = `https://wa.me/${cleanPhone}?text=${waMessage}`;
+
+                const cardHtml = `
+          <div class="bg-white rounded-2xl p-4 border ${cardBg} shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+            
+            <!-- Category & Batch Header -->
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${badgeBg}">
+                ${categoryLabel}
+              </span>
+              <span class="text-[11px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
+                ${post.batch || 'BITS Alumni'}
+              </span>
+            </div>
+
+            <!-- Card Headline -->
+            <h3 class="font-extrabold text-sm text-stone-900 mb-1 leading-snug">
+              ${post.headline}
+            </h3>
+
+            <!-- Card Description -->
+            <p class="text-xs text-stone-600 leading-relaxed mb-3">
+              ${post.description}
+            </p>
+
+            <!-- Card Footer & WhatsApp CTA -->
+            <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+              <span class="text-[11px] font-semibold text-stone-500 truncate max-w-[150px]">
+                ${post.role ? '📍 ' + post.role : 'BITSian'}
+              </span>
+
+              <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95">
+                <span>WhatsApp Ping</span>
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+              </a>
+            </div>
+
+          </div>
+        `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // Filter Logic
+        function filterCards(type) {
+            currentFilter = type;
+            ['ALL', 'ASK', 'OFFER'].forEach(t => {
+                const btn = document.getElementById(`tab-${t.toLowerCase()}`);
+                if (t === type) {
+                    btn.className = 'flex-1 py-2 rounded-lg transition-all bg-white text-stone-900 shadow-sm';
+                } else {
+                    btn.className = 'flex-1 py-2 rounded-lg transition-all text-stone-600 hover:text-stone-900';
+                }
+            });
+            renderCards();
+        }
+
+        // Modal Control
+        function toggleModal(show) {
+            const modal = document.getElementById('post-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Submit Form
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = 'Pinning... 📌';
+            submitBtn.disabled = true;
+
+            const payload = {
+                category: document.querySelector('input[name="category"]:checked').value,
+                headline: document.getElementById('headline').value,
+                description: document.getElementById('description').value,
+                batch: document.getElementById('batch').value,
+                role: document.getElementById('role').value,
+                contact: document.getElementById('contact').value,
+            };
+
+            try {
+                if (APPS_SCRIPT_URL !== "https://script.google.com/macros/s/AKfycbxWUoweNvJHgqGbjVt_5r0YY0L4ceaKEOA40OtmaudCd07EhyF2sCLTijbcJxM31J_h/exec") {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                // Optimistic UI Update
+                allPosts.unshift({ id: 'p_' + Date.now(), ...payload });
+                renderCards();
+
+                // Reset & Close
+                document.getElementById('card-form').reset();
+                toggleModal(false);
+            } catch (err) {
+                alert("Failed to pin postcard. Please try again.");
+            } finally {
+                submitBtn.innerText = 'Pin to Wall 🚀';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Initial Load
+        fetchPosts();
+    </script>
+</body>
+
+</html>
